@@ -1,0 +1,38 @@
+# Git Commands for Iris AI Project
+
+## Already Done ✅
+git init
+git config user.name "Your Name"
+git config user.email "your.email@example.com"
+git config core.autocrlf true
+git add .
+git commit -m "Initial commit: Iris AI voice assistant with persistent memory"
+
+## Next Steps - Run These in Git Bash:
+
+# 1. Go to https://github.com/new and create a new repository named "iris-ai"
+#    - Make it public or private
+#    - DON'T initialize with README (we already have one)
+
+# 2. Add GitHub as remote (replace YOUR_USERNAME with your GitHub username)
+git remote add origin https://github.com/YOUR_USERNAME/iris-ai.git
+
+# 3. Rename branch to main
+git branch -M main
+
+# 4. Push to GitHub
+git push -u origin main
+
+# Done! Your code is now on GitHub 🎉
+
+## Future Updates:
+
+# After making changes, commit and push:
+git add .
+git commit -m "Description of changes"
+git push
+
+## Important Notes:
+- Your .env file with API keys is SAFE and will NOT be uploaded
+- Only .env.example is in the repository
+- Anyone cloning will need to create their own .env file

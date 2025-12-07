@@ -1,0 +1,15 @@
+{
+  "reportMissingTypeStubs": false,
+  "reportMissingImports": false,
+  "reportUnknownParameterType": false,
+  "reportUnknownArgumentType": false,
+  "reportUnknownVariableType": false,
+  "reportUnknownMemberType": false,
+  "reportUnknownLambdaType": false,
+  "reportGeneralTypeIssues": false,
+  "reportOptionalMemberAccess": false,
+  "reportOptionalSubscript": false,
+  "reportPrivateImportUsage": false,
+  "reportUnusedImport": "warning",
+  "reportUnusedVariable": "warning"
+}

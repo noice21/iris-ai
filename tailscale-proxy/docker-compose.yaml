@@ -1,0 +1,59 @@
+services:
+  iris-tailscale-proxy:
+    image: tailscale/tailscale:latest
+    container_name: iris-tailscale-proxy
+    hostname: iris-backend
+
+    environment:
+      # Get your auth key from: https://login.tailscale.com/admin/settings/keys
+      - TS_AUTHKEY=${TS_AUTHKEY}
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_USERSPACE=false
+
+    volumes:
+      # Persistent Tailscale state
+      - ./tailscale-state:/var/lib/tailscale
+      # Nginx configuration
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+
+    # Use host network to access host services
+    network_mode: host
+
+    # Required for Tailscale networking
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+
+    restart: unless-stopped
+
+    # Install nginx and start both Tailscale and Nginx
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        # Install nginx
+        apk add --no-cache nginx
+
+        # Start Tailscale and wait for it to be ready
+        echo "Starting Tailscale..."
+        /usr/local/bin/containerboot &
+
+        # Wait for Tailscale to authenticate and get an IP
+        echo "Waiting for Tailscale to authenticate..."
+        for i in 1 2 3 4 5 6 7 8 9 10; do
+          sleep 3
+          TAILSCALE_IP=$$(tailscale ip -4 2>/dev/null || echo "")
+          if [ -n "$$TAILSCALE_IP" ]; then
+            echo "Tailscale connected! IP: $$TAILSCALE_IP"
+            break
+          fi
+          echo "Still waiting... (attempt $$i/10)"
+        done
+
+        if [ -z "$$TAILSCALE_IP" ]; then
+          echo "WARNING: Tailscale did not get an IP address"
+          echo "Check: docker exec iris-tailscale-proxy tailscale status"
+        fi
+
+        # Start nginx in foreground
+        echo "Starting Nginx reverse proxy on port 3001..."
+        nginx -g 'daemon off;'

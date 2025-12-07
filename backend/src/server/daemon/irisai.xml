@@ -1,0 +1,31 @@
+<service>
+	<id>irisai.exe</id>
+	<name>Iris AI</name>
+	<description>Iris AI Backend Service - Voice assistant with memory</description>
+	<executable>C:\Program Files\nodejs\node.exe</executable>
+	<argument>I:\Iris-ai\backend\node_modules\node-windows\lib\wrapper.js</argument>
+	<argument>--file</argument>
+	<argument>I:\Iris-ai\backend\src\server\index.js</argument>
+	<argument>--scriptoptions=</argument>
+	<argument>--log</argument>
+	<argument>Iris AI wrapper</argument>
+	<argument>--grow</argument>
+	<argument>0.25</argument>
+	<argument>--wait</argument>
+	<argument>1</argument>
+	<argument>--maxrestarts</argument>
+	<argument>3</argument>
+	<argument>--abortonerror</argument>
+	<argument>n</argument>
+	<argument>--stopparentfirst</argument>
+	<argument>undefined</argument>
+	<logmode>rotate</logmode>
+	<stoptimeout>30sec</stoptimeout>
+	<env name="NODE_ENV" value="production"/>
+	<serviceaccount>
+		<domain>ERICSON-DESKTOP</domain>
+		<user>LocalSystem</user>
+		<password></password>
+	</serviceaccount>
+	<workingdirectory>I:\Iris-ai\backend</workingdirectory>
+</service>

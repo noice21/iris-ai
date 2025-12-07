@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- Allow cleartext traffic for localhost and Tailscale -->
+    <domain-config cleartextTrafficPermitted="true">
+        <!-- Local development -->
+        <domain includeSubdomains="true">localhost</domain>
+        <domain includeSubdomains="true">127.0.0.1</domain>
+        <domain includeSubdomains="true">10.0.2.2</domain> <!-- Android emulator host -->
+        <domain includeSubdomains="true">192.168.1.0</domain> <!-- Local network -->
+
+        <!-- Tailscale IP range (100.64.0.0/10) -->
+        <domain includeSubdomains="true">100.64.0.0</domain>
+        <domain includeSubdomains="true">100.65.0.0</domain>
+        <domain includeSubdomains="true">100.66.0.0</domain>
+        <domain includeSubdomains="true">100.67.0.0</domain>
+        <domain includeSubdomains="true">100.68.0.0</domain>
+        <domain includeSubdomains="true">100.69.0.0</domain>
+        <domain includeSubdomains="true">100.70.0.0</domain>
+        <domain includeSubdomains="true">100.71.0.0</domain>
+
+        <!-- Add your specific Tailscale hostname if you have one -->
+        <!-- <domain includeSubdomains="true">your-device.tailscale-name.ts.net</domain> -->
+    </domain-config>
+
+    <!-- For all other domains, use default security (HTTPS required) -->
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>

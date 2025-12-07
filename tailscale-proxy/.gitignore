@@ -1,0 +1,8 @@
+# Tailscale state directory
+tailscale-state/
+
+# Environment file with auth key
+.env
+
+# Logs
+*.log

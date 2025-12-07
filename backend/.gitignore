@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Build
+dist/
+build/
+
+# Temp files
+tmp/
+temp/
+*.tmp
+
+# Generated images
+output/
+D:/images/
+
+# ML Models (too large for GitHub - download separately)
+python_service/models/
+python_service/voices/
+python_service/kokoro_models/

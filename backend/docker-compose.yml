@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  iris-ai:
+    build: .
+    container_name: iris-ai
+    restart: always
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    networks:
+      - expense_net
+
+networks:
+  expense_net:
+    external: true

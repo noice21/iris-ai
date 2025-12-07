@@ -1,0 +1,93 @@
+name: iris_app
+description: "Iris AI Voice Assistant"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.10.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+
+  # State management
+  provider: ^6.1.2
+
+  # WebSocket
+  web_socket_channel: ^3.0.1
+
+  # HTTP requests
+  http: ^1.2.0
+
+  # Audio recording
+  record: ^6.1.2
+
+  # Audio playback
+  audioplayers: ^6.1.0
+
+  # Voice Activity Detection (Silero VAD)
+  vad: ^0.0.7+1
+
+  # Audio visualizer
+  audio_waveforms: ^2.0.0
+
+  # Permissions
+  permission_handler: ^12.0.1
+
+  # Device info for unique ID
+  device_info_plus: ^12.2.0
+
+  # Wake lock to keep connection alive during sleep
+  wakelock_plus: ^1.2.8
+
+  # Storage
+  shared_preferences: ^2.3.2
+
+  # Path utilities
+  path_provider: ^2.1.4
+  path: ^1.9.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.1
+
+flutter:
+  uses-material-design: true
+  assets:
+    - asset/iris_icon.png
+    - assets/vad/silero_vad_v5.onnx
+
+# App icon configuration
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "asset/iris_icon.png"
+  adaptive_icon_background: "#1a1a2e"
+  adaptive_icon_foreground: "asset/iris_icon.png"
+  remove_alpha_ios: true
+
+  # Windows
+  windows:
+    generate: true
+    image_path: "asset/iris_icon.png"
+    icon_size: 48
+
+  # macOS
+  macos:
+    generate: true
+    image_path: "asset/iris_icon.png"
+
+  # Linux
+  linux:
+    generate: true
+    image_path: "asset/iris_icon.png"
+
+  # Web
+  web:
+    generate: true
+    image_path: "asset/iris_icon.png"
+    background_color: "#1a1a2e"
+    theme_color: "#1a1a2e"

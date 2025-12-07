@@ -1,0 +1,19 @@
+# STT - Faster Whisper with DirectML support for AMD GPU
+faster-whisper
+onnxruntime-directml
+
+# HTTP Server
+flask
+flask-cors
+
+# Audio processing
+numpy
+soundfile
+
+# TTS - Kokoro ONNX (high quality, fast, Python 3.12 compatible)
+kokoro-onnx
+onnxruntime
+torch
+
+# Utilities
+requests

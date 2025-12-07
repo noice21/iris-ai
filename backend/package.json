@@ -1,0 +1,37 @@
+{
+  "name": "iris-ai-avatar",
+  "version": "1.0.0",
+  "description": "AI Avatar Backend with OpenRouter LLM and ElevenLabs STT/TTS",
+  "main": "src/server/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server/index.js",
+    "dev": "node --watch src/server/index.js",
+    "install-service": "node service-install.js",
+    "uninstall-service": "node service-uninstall.js"
+  },
+  "dependencies": {
+    "@fastify/cors": "^9.0.1",
+    "@fastify/multipart": "^8.3.0",
+    "@fastify/websocket": "^10.0.1",
+    "dotenv": "^16.4.5",
+    "fastify": "^4.28.1",
+    "ffmpeg-static": "^5.2.0",
+    "fluent-ffmpeg": "^2.1.3",
+    "form-data": "^4.0.5",
+    "mysql2": "^3.11.0",
+    "node-fetch": "^3.3.2",
+    "node-windows": "^1.0.0-beta.8",
+    "puppeteer": "^22.0.0",
+    "ws": "^8.18.0"
+  },
+  "keywords": [
+    "ai",
+    "avatar",
+    "openrouter",
+    "elevenlabs",
+    "tts",
+    "stt"
+  ],
+  "license": "MIT"
+}
