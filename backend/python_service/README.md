@@ -134,7 +134,7 @@ This initializes the Whisper model and confirms it's ready.
 
 ## Integration with Iris Backend
 
-The Node.js backend automatically uses this service when configured:
+The Node.js backend **automatically starts and manages** this Python service when configured to use local TTS/STT:
 
 **.env:**
 ```env
@@ -142,6 +142,13 @@ TTS_PROVIDER=local
 STT_PROVIDER=local
 LOCAL_TTS_URL=http://localhost:5000
 ```
+
+When you run `npm start` in the backend directory, the Python service will:
+- ✅ Start automatically if `TTS_PROVIDER=local` or `STT_PROVIDER=local`
+- ✅ Shut down automatically when you stop the backend (Ctrl+C)
+- ✅ Display Python service logs prefixed with `[Python Service]`
+
+**No need to manually start `python server.py`** - the backend handles it for you!
 
 ## Troubleshooting
 
