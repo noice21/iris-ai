@@ -215,23 +215,27 @@ class AudioService extends ChangeNotifier {
 
     await playAudio(completeAudio);
 
-    // Estimate duration based on MP3 bitrate (128kbps = 16000 bytes/sec)
-    // Add 500ms buffer for safety
-    final estimatedDurationMs = (completeAudio.length / 16000 * 1000).round() + 500;
-    debugPrint('Estimated audio duration: ${estimatedDurationMs}ms');
+    // Estimate max duration based on MP3 bitrate (128kbps = 16000 bytes/sec)
+    // Use 3x estimate as timeout ceiling so we don't cut off early
+    final estimatedDurationMs = (completeAudio.length / 16000 * 1000).round();
+    final timeoutMs = estimatedDurationMs * 3 + 2000;
+    debugPrint('Estimated audio duration: ${estimatedDurationMs}ms, timeout: ${timeoutMs}ms');
 
-    // Wait for playback to complete with a timeout based on estimated duration
-    // This handles the case where onPlayerComplete doesn't fire due to threading issues
+    // Wait for playback to complete via onPlayerComplete callback
+    // Timeout is a generous safety net — we prefer the callback to fire naturally
     try {
       await _playbackCompleter!.future.timeout(
-        Duration(milliseconds: estimatedDurationMs),
+        Duration(milliseconds: timeoutMs),
         onTimeout: () {
-          debugPrint('Playback wait timed out after ${estimatedDurationMs}ms - assuming complete');
+          debugPrint('Playback wait timed out after ${timeoutMs}ms - assuming complete');
         },
       );
     } catch (e) {
       debugPrint('Error waiting for playback: $e');
     }
+
+    // Extra delay to ensure audio device is fully released before VAD grabs the mic
+    await Future.delayed(const Duration(milliseconds: 500));
     debugPrint('Audio playback finished');
   }
 

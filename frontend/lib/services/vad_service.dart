@@ -340,8 +340,9 @@ class VadService extends ChangeNotifier {
     debugPrint('[VAD] Resuming VAD from pause');
     _isPaused = false;
 
-    // Longer delay to ensure the previous stop operation is complete
-    await Future.delayed(const Duration(milliseconds: 300));
+    // Longer delay to ensure audio playback has fully released the mic
+    // and the previous stop operation is complete
+    await Future.delayed(const Duration(milliseconds: 800));
 
     // Start listening again - this will work even if state shows listening
     // because we actually stopped the handler during pause

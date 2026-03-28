@@ -169,6 +169,42 @@ export function isValidUrl(str) {
  * Create a simple event emitter
  * @returns {Object} - Event emitter
  */
+/**
+ * Strip markdown formatting from text for TTS output
+ * @param {string} text - Text potentially containing markdown
+ * @returns {string} - Clean text suitable for speech
+ */
+export function stripMarkdown(text) {
+  if (!text) return text;
+  return text
+    // Remove headers: ## Header -> Header
+    .replace(/^#{1,6}\s+/gm, '')
+    // Remove bold/italic: **text** or *text* or __text__ or _text_
+    .replace(/(\*{1,3}|_{1,3})(.*?)\1/g, '$2')
+    // Remove inline code: `code` -> code
+    .replace(/`([^`]*)`/g, '$1')
+    // Remove code blocks: ```...```
+    .replace(/```[\s\S]*?```/g, '')
+    // Remove horizontal rules: --- or ***
+    .replace(/^[-*_]{3,}\s*$/gm, '')
+    // Remove bullet points: - item or * item
+    .replace(/^[\s]*[-*+]\s+/gm, '')
+    // Remove numbered lists: 1. item
+    .replace(/^[\s]*\d+\.\s+/gm, '')
+    // Remove links: [text](url) -> text
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
+    // Remove images: ![alt](url)
+    .replace(/!\[([^\]]*)\]\([^)]*\)/g, '$1')
+    // Remove blockquotes: > text -> text
+    .replace(/^>\s+/gm, '')
+    // Remove pipe tables
+    .replace(/\|/g, ',')
+    .replace(/^[-:| ]+$/gm, '')
+    // Collapse multiple newlines
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
 export function createEventEmitter() {
   const listeners = new Map();
 

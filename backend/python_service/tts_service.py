@@ -4,12 +4,17 @@ High-quality, natural neural text-to-speech
 """
 import os
 import tempfile
+from typing import Any
 from pathlib import Path
 import torch
-from kokoro_onnx import Kokoro
+from kokoro_onnx import Kokoro  # pyright: ignore[reportMissingTypeStubs]
 
 class TTSService:
-    def __init__(self, voice_name="af_bella"):
+    voice_name: str
+    kokoro: Any
+    custom_voices: dict[str, Any]
+
+    def __init__(self, voice_name: str = "af_bella"):
         """
         Initialize Kokoro TTS
 
@@ -49,7 +54,7 @@ class TTSService:
             print(f"[TTS] Failed to load Kokoro: {e}")
             raise
 
-    def _load_custom_voice(self, voice_name):
+    def _load_custom_voice(self, voice_name: str) -> Any:
         """Load a custom voice file (.pt) if it exists"""
         if voice_name in self.custom_voices:
             return self.custom_voices[voice_name]
@@ -69,7 +74,7 @@ class TTSService:
                 return None
         return None
 
-    def synthesize(self, text, speed=1.0):
+    def synthesize(self, text: str, speed: float = 1.0) -> bytes:
         """
         Synthesize speech from text
 
@@ -112,7 +117,7 @@ class TTSService:
             except:
                 pass
 
-    def synthesize_streaming(self, text, chunk_callback, speed=1.0):
+    def synthesize_streaming(self, text: str, chunk_callback: Any, speed: float = 1.0) -> None:
         """
         Synthesize speech with streaming output
 
@@ -132,7 +137,7 @@ class TTSService:
             chunk = audio_data[i:i + chunk_size]
             chunk_callback(chunk)
 
-    def list_available_voices(self):
+    def list_available_voices(self) -> list[str]:
         """List all available voice models"""
         # Built-in voices
         voices = [
@@ -154,7 +159,7 @@ class TTSService:
 
         return voices
 
-    def change_voice(self, voice_name):
+    def change_voice(self, voice_name: str) -> bool:
         """Change to a different voice"""
         # For Kokoro, we just need to update the voice_name
         # The actual voice is selected during synthesis

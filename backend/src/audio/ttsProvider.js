@@ -55,7 +55,7 @@ export async function transcribeAudio(audioBuffer) {
  * @param {string} text - Input text
  * @returns {string} - Cleaned text
  */
-function cleanTextForTTS(text) {
+export function cleanTextForTTS(text) {
   if (!text) return '';
 
   // Remove emojis and other problematic Unicode characters

@@ -1,6 +1,5 @@
-# STT - Faster Whisper with DirectML support for AMD GPU
+# STT - Faster Whisper
 faster-whisper
-onnxruntime-directml
 
 # HTTP Server
 flask

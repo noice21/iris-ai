@@ -1,5 +1,6 @@
 import { query } from './connection.js';
 import { generateId } from '../utils/helpers.js';
+import { initKnowledgeGraphSchema } from '../tools/knowledgeGraph.js';
 
 /**
  * Initialize database schema
@@ -63,6 +64,9 @@ export async function initializeSchema() {
       FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     )
   `);
+
+  // Initialize knowledge graph tables
+  await initKnowledgeGraphSchema();
 
   console.log('Database schema initialized');
 }

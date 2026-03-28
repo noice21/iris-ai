@@ -4,11 +4,16 @@ Fast, local speech-to-text using Faster-Whisper with DirectML (AMD GPU support)
 """
 import os
 import tempfile
+from typing import Any
 from pathlib import Path
-from faster_whisper import WhisperModel
+from faster_whisper import WhisperModel  # pyright: ignore[reportMissingTypeStubs]
 
 class STTService:
-    def __init__(self, model_size="base", device="auto"):
+    model_size: str
+    device: str
+    model: Any
+
+    def __init__(self, model_size: str = "base", device: str = "auto"):
         """
         Initialize Faster-Whisper STT
 
@@ -29,7 +34,7 @@ class STTService:
 
         self.load_model(model_size, device)
 
-    def load_model(self, model_size="base", device="auto"):
+    def load_model(self, model_size: str = "base", device: str = "auto") -> None:
         """Load Whisper model"""
         print(f"[STT] Loading Whisper model: {model_size} on {device}")
 
@@ -51,7 +56,7 @@ class STTService:
             print(f"[STT] Failed to load model: {e}")
             raise
 
-    def transcribe(self, audio_path, language="en"):
+    def transcribe(self, audio_path: str, language: str = "en") -> str:
         """
         Transcribe audio file to text
 
@@ -86,7 +91,7 @@ class STTService:
 
         return full_text.strip()
 
-    def transcribe_bytes(self, audio_bytes, language="en"):
+    def transcribe_bytes(self, audio_bytes: bytes, language: str = "en") -> str:
         """
         Transcribe audio from bytes
 
@@ -113,7 +118,7 @@ class STTService:
             except:
                 pass
 
-    def change_model(self, model_size):
+    def change_model(self, model_size: str) -> None:
         """Change to a different model size"""
         self.load_model(model_size, self.device)
 

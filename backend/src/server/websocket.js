@@ -1,8 +1,9 @@
+import jwt from 'jsonwebtoken';
 import { processAudioChunk, finalizeAudioStream } from '../audio/processor.js';
 import { generateStreamingResponse } from '../llm/pipeline.js';
 import { synthesizeSpeechStream, transcribeAudio } from '../audio/ttsProvider.js';
 import { sendToAvatar } from '../avatar/bridge.js';
-import { generateId } from '../utils/helpers.js';
+import { generateId, stripMarkdown } from '../utils/helpers.js';
 import { getOrCreateUser, getActiveConversation } from '../database/memory.js';
 
 const sessions = new Map();
@@ -11,10 +12,29 @@ export function setupWebSocket(fastify) {
   fastify.register(async function (fastify) {
     fastify.get('/ws', { websocket: true }, async (socket, req) => {
       const sessionId = generateId();
-
-      // Get device ID from query params or generate one
+      const cloudMode = process.env.CLOUD_MODE === 'true';
       const url = new URL(req.url, 'http://localhost');
-      const deviceId = url.searchParams.get('deviceId') || sessionId;
+
+      let deviceId;
+
+      if (cloudMode) {
+        const token = url.searchParams.get('token');
+        if (!token) {
+          socket.send(JSON.stringify({ type: 'error', error: 'Missing auth token' }));
+          socket.close();
+          return;
+        }
+        try {
+          const payload = jwt.verify(token, process.env.SUPABASE_JWT_SECRET, { algorithms: ['HS256'] });
+          deviceId = payload.sub;
+        } catch (err) {
+          socket.send(JSON.stringify({ type: 'error', error: 'Invalid auth token' }));
+          socket.close();
+          return;
+        }
+      } else {
+        deviceId = url.searchParams.get('deviceId') || sessionId;
+      }
 
       // Get or create user and conversation from database
       const user = await getOrCreateUser(deviceId);
@@ -274,8 +294,9 @@ async function processTextInput(sessionId, text) {
             console.log('[TTS] Starting speech synthesis for:', completeText.substring(0, 50) + '...');
             socket.send(JSON.stringify({ type: 'synthesizing' }));
 
+            const ttsText = stripMarkdown(completeText);
             await synthesizeSpeechStream(
-              completeText,
+              ttsText,
               // Audio chunk callback
               (audioChunk, phonemes) => {
                 // Send audio to client
@@ -351,7 +372,7 @@ async function processGreeting(sessionId) {
         socket.send(JSON.stringify({ type: 'synthesizing' }));
 
         await synthesizeSpeechStream(
-          greetingText,
+          stripMarkdown(greetingText),
           (audioChunk, phonemes) => {
             socket.send(audioChunk);
             if (phonemes) {

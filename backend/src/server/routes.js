@@ -4,6 +4,9 @@ import { transcribeAudio } from '../audio/ttsProvider.js';
 import { getAvailableModels, setDefaultModel } from '../tools/imageGeneration.js';
 import { synthesizeSpeechLocal } from '../audio/localTTS.js';
 import { synthesizeSpeech as synthesizeSpeechElevenlabs } from '../audio/elevenlabs.js';
+import { stripMarkdown } from '../utils/helpers.js';
+import { cleanTextForTTS } from '../audio/ttsProvider.js';
+import { buildAuthHook } from './auth.js';
 
 /**
  * Get TTS provider based on environment
@@ -19,22 +22,31 @@ function getTTSProvider() {
 async function synthesizeSpeech(text, voiceId = null) {
   const provider = getTTSProvider();
 
+  // Strip emojis and problematic Unicode before sending to TTS engine
+  const cleanedText = cleanTextForTTS(text);
+  if (!cleanedText || cleanedText.trim().length === 0) {
+    throw new Error('Text is empty after removing unsupported characters');
+  }
+
   console.log(`[TTS] REST endpoint using provider: ${provider}`);
 
   if (provider === 'local') {
     // Local TTS returns WAV format
-    const audioBuffer = await synthesizeSpeechLocal(text);
+    const audioBuffer = await synthesizeSpeechLocal(cleanedText);
     return { buffer: audioBuffer, contentType: 'audio/wav' };
   } else {
     // ElevenLabs returns MP3 format
-    const audioBuffer = await synthesizeSpeechElevenlabs(text, voiceId);
+    const audioBuffer = await synthesizeSpeechElevenlabs(cleanedText, voiceId);
     return { buffer: audioBuffer, contentType: 'audio/mpeg' };
   }
 }
 
 export function setupRoutes(fastify) {
+  const authHook = buildAuthHook();
+  const protectedOpts = { preHandler: [authHook] };
+
   // Process audio and get AI response
-  fastify.post('/api/chat', async (request, reply) => {
+  fastify.post('/api/chat', protectedOpts, async (request, reply) => {
     try {
       const { message, conversationId } = request.body;
 
@@ -55,7 +67,7 @@ export function setupRoutes(fastify) {
   });
 
   // Upload audio for transcription
-  fastify.post('/api/transcribe', async (request, reply) => {
+  fastify.post('/api/transcribe', protectedOpts, async (request, reply) => {
     try {
       const data = await request.file();
 
@@ -84,7 +96,7 @@ export function setupRoutes(fastify) {
   });
 
   // Text to speech endpoint
-  fastify.post('/api/synthesize', async (request, reply) => {
+  fastify.post('/api/synthesize', protectedOpts, async (request, reply) => {
     try {
       const { text, voiceId } = request.body;
 
@@ -109,7 +121,7 @@ export function setupRoutes(fastify) {
   });
 
   // Full pipeline: audio in -> transcribe -> LLM -> TTS -> audio out
-  fastify.post('/api/process', async (request, reply) => {
+  fastify.post('/api/process', protectedOpts, async (request, reply) => {
     try {
       const data = await request.file();
 
@@ -130,7 +142,7 @@ export function setupRoutes(fastify) {
       const llmResponse = await generateResponse(transcript);
 
       // Synthesize speech
-      const { buffer, contentType } = await synthesizeSpeech(llmResponse.text);
+      const { buffer, contentType } = await synthesizeSpeech(stripMarkdown(llmResponse.text));
 
       reply.header('Content-Type', contentType);
       reply.header('X-Transcript', encodeURIComponent(transcript));

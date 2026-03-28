@@ -1,0 +1,6 @@
+node_modules/
+python_service/
+output/
+.env
+.env.*
+*.log

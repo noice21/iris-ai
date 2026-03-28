@@ -1,8 +1,11 @@
+// Load .env BEFORE any other imports so env vars are available at module init time
+import dotenv from 'dotenv';
+dotenv.config();
+
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import websocket from '@fastify/websocket';
 import multipart from '@fastify/multipart';
-import dotenv from 'dotenv';
 import { spawn } from 'child_process';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
@@ -11,8 +14,6 @@ import { setupRoutes } from './routes.js';
 import { setupWebSocket } from './websocket.js';
 import { getPool, closePool } from '../database/connection.js';
 import { initializeSchema } from '../database/memory.js';
-
-dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -47,7 +48,7 @@ function startPythonService() {
     DEBUG: 'false'
   };
 
-  pythonProcess = spawn('python', ['server.py'], {
+  pythonProcess = spawn('py', ['server.py'], {
     cwd: pythonServicePath,
     stdio: ['ignore', 'pipe', 'pipe'],
     env: pythonEnv
@@ -88,8 +89,12 @@ async function start() {
   await initializeSchema();
   console.log('Database initialized');
 
-  // Start Python service for local TTS/STT
-  startPythonService();
+  // Start Python service for local TTS/STT (skip in cloud mode - runs as separate service)
+  if (process.env.CLOUD_MODE !== 'true') {
+    startPythonService();
+  } else {
+    console.log('[Python Service] Cloud mode - using external service at', process.env.LOCAL_TTS_URL || 'not configured');
+  }
 
   // Register plugins
   await fastify.register(cors, {

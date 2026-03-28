@@ -60,21 +60,22 @@ def synthesize():
     if not tts_service:
         return jsonify({"error": "TTS service not available"}), 503
 
+    tts = tts_service
     try:
         data = request.get_json()
         text = data.get('text', '')
         speed = float(data.get('speed', 1.0))
-        voice = data.get('voice', tts_service.voice_name)
+        voice = data.get('voice', tts.voice_name)
 
         if not text:
             return jsonify({"error": "No text provided"}), 400
 
         # Change voice if different from current
-        if voice != tts_service.voice_name:
-            tts_service.change_voice(voice)
+        if voice != tts.voice_name:
+            tts.change_voice(voice)
 
         # Synthesize
-        audio_data = tts_service.synthesize(text, speed=speed)
+        audio_data = tts.synthesize(text, speed=speed)
 
         # Return as WAV file
         return send_file(
@@ -94,10 +95,11 @@ def list_voices():
     if not tts_service:
         return jsonify({"error": "TTS service not available"}), 503
 
-    voices = tts_service.list_available_voices()
+    tts = tts_service
+    voices = tts.list_available_voices()
     return jsonify({
         "voices": voices,
-        "current": tts_service.voice_name
+        "current": tts.voice_name
     })
 
 @app.route('/tts/voice', methods=['POST'])
@@ -113,6 +115,7 @@ def change_voice():
     if not tts_service:
         return jsonify({"error": "TTS service not available"}), 503
 
+    tts = tts_service
     try:
         data = request.get_json()
         voice_name = data.get('voice', '')
@@ -120,7 +123,7 @@ def change_voice():
         if not voice_name:
             return jsonify({"error": "No voice specified"}), 400
 
-        tts_service.change_voice(voice_name)
+        tts.change_voice(voice_name)
 
         return jsonify({
             "success": True,
@@ -151,6 +154,7 @@ def transcribe():
     if not stt_service:
         return jsonify({"error": "STT service not available"}), 503
 
+    stt = stt_service
     try:
         # Get audio file
         if 'audio' not in request.files:
@@ -163,7 +167,7 @@ def transcribe():
         audio_bytes = audio_file.read()
 
         # Transcribe
-        text = stt_service.transcribe_bytes(audio_bytes, language=language)
+        text = stt.transcribe_bytes(audio_bytes, language=language)
 
         return jsonify({
             "text": text,
@@ -187,6 +191,7 @@ def change_model():
     if not stt_service:
         return jsonify({"error": "STT service not available"}), 503
 
+    stt = stt_service
     try:
         data = request.get_json()
         model_size = data.get('model', 'base')
@@ -195,7 +200,7 @@ def change_model():
         if model_size not in valid_models:
             return jsonify({"error": f"Invalid model. Choose from: {valid_models}"}), 400
 
-        stt_service.change_model(model_size)
+        stt.change_model(model_size)
 
         return jsonify({
             "success": True,

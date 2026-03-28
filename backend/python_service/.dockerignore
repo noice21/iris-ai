@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+kokoro_models/
+models/
+test_output.wav
