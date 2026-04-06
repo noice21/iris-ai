@@ -29,8 +29,11 @@ class IrisWebSocketService extends ChangeNotifier {
   static const String _localUrl = 'ws://192.168.68.62:3001/ws';
   static const String _tailscaleUrl =
       'ws://100.71.195.127:3001/ws'; // Tailscale IP from iris-tailscale-proxy
+  static const String _cloudUrl =
+      'wss://iris-backend-production-626d.up.railway.app/ws';
   bool _useTailscale = false;
-  String get _serverUrl => _useTailscale ? _tailscaleUrl : _localUrl;
+  bool _useCloud = false; // Default to local
+  String get _serverUrl => _useCloud ? _cloudUrl : (_useTailscale ? _tailscaleUrl : _localUrl);
 
   // Reconnection state
   bool _shouldReconnect = true;
@@ -60,6 +63,7 @@ class IrisWebSocketService extends ChangeNotifier {
   Stream<String> get responseStream => _responseController.stream;
   Stream<GeneratedImage> get imageStream => _imageController.stream;
   bool get useTailscale => _useTailscale;
+  bool get useCloud => _useCloud;
   String get currentServerUrl => _serverUrl;
 
   // Response building
@@ -71,6 +75,12 @@ class IrisWebSocketService extends ChangeNotifier {
   String _thinkingMessage = '';
   bool get isThinking => _isThinking;
   String get thinkingMessage => _thinkingMessage;
+
+  // Set whether to use cloud (Railway) connection
+  void setUseCloud(bool enabled) {
+    _useCloud = enabled;
+    notifyListeners();
+  }
 
   // Set whether to use Tailscale or local connection
   void setUseTailscale(bool enabled) {

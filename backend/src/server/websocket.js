@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+import { verifySupabaseToken } from './supabaseAuth.js';
 import { processAudioChunk, finalizeAudioStream } from '../audio/processor.js';
 import { generateStreamingResponse } from '../llm/pipeline.js';
 import { synthesizeSpeechStream, transcribeAudio } from '../audio/ttsProvider.js';
@@ -12,22 +12,18 @@ export function setupWebSocket(fastify) {
   fastify.register(async function (fastify) {
     fastify.get('/ws', { websocket: true }, async (socket, req) => {
       const sessionId = generateId();
-      const cloudMode = process.env.CLOUD_MODE === 'true';
       const url = new URL(req.url, 'http://localhost');
 
       let deviceId;
 
-      if (cloudMode) {
-        const token = url.searchParams.get('token');
-        if (!token) {
-          socket.send(JSON.stringify({ type: 'error', error: 'Missing auth token' }));
-          socket.close();
-          return;
-        }
+      // Accept token auth (cloud clients) or deviceId (local/simple clients)
+      const token = url.searchParams.get('token');
+      if (token) {
         try {
-          const payload = jwt.verify(token, process.env.SUPABASE_JWT_SECRET, { algorithms: ['HS256'] });
+          const payload = await verifySupabaseToken(token);
           deviceId = payload.sub;
         } catch (err) {
+          console.error('[Auth] Token verification failed:', err.message);
           socket.send(JSON.stringify({ type: 'error', error: 'Invalid auth token' }));
           socket.close();
           return;

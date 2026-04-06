@@ -260,7 +260,7 @@ if __name__ == '__main__':
     print()
 
     app.run(
-        host='0.0.0.0',
+        host='::',
         port=port,
         debug=os.getenv('DEBUG', 'false').lower() == 'true'
     )

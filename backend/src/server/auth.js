@@ -1,11 +1,17 @@
-import jwt from 'jsonwebtoken';
+import { verifySupabaseToken } from './supabaseAuth.js';
 
 export function buildAuthHook() {
-  const secret = process.env.SUPABASE_JWT_SECRET;
   const cloudMode = process.env.CLOUD_MODE === 'true';
+  const serviceKey = process.env.SERVICE_API_KEY;
 
   return async function authHook(request, reply) {
     if (!cloudMode) return;
+
+    // Allow service-to-service calls with a static key
+    const incomingKey = (request.headers['x-api-key'] ?? '').trim();
+    const storedKey = (serviceKey ?? '').trim();
+    console.log(`[Auth] storedKey.len=${storedKey.length} incomingKey.len=${incomingKey.length} match=${incomingKey === storedKey}`);
+    if (storedKey && incomingKey === storedKey) return;
 
     const authHeader = request.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -14,7 +20,7 @@ export function buildAuthHook() {
 
     try {
       const token = authHeader.slice(7);
-      const payload = jwt.verify(token, secret, { algorithms: ['HS256'] });
+      const payload = await verifySupabaseToken(token);
       request.user = { id: payload.sub, email: payload.email };
     } catch (err) {
       return reply.status(401).send({ error: 'Invalid or expired token' });
