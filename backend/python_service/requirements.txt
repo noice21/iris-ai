@@ -4,6 +4,7 @@ faster-whisper
 # HTTP Server
 flask
 flask-cors
+gunicorn
 
 # Audio processing
 numpy

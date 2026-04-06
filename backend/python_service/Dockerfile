@@ -16,4 +16,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 RUN python download_models.py
-CMD ["python", "server.py"]
+CMD ["sh", "-c", "gunicorn --bind [::]:${PORT:-5000} --workers 1 --timeout 120 server:app"]
