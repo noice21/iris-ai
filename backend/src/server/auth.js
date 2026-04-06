@@ -10,7 +10,6 @@ export function buildAuthHook() {
     // Allow service-to-service calls with a static key
     const incomingKey = (request.headers['x-api-key'] ?? '').trim();
     const storedKey = (serviceKey ?? '').trim();
-    console.log(`[Auth] storedKey.len=${storedKey.length} incomingKey.len=${incomingKey.length} match=${incomingKey === storedKey}`);
     if (storedKey && incomingKey === storedKey) return;
 
     const authHeader = request.headers.authorization;
